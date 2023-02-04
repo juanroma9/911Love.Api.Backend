@@ -1,24 +1,33 @@
 import {config}         from 'dotenv';
 import express          from 'express';
 import {ApolloServer}   from 'apollo-server-express';
-import typeDefs         from './typeDefs.js';
-import resolvers        from './resolvers.js';
-import connect_db       from './database.js';
+import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge';
+
+import connectMongoDb       from './models/ConnectMongoDb.js';
+import HeroSliderResolver   from './resolvers/hero_slider_resolver.js'
+import HeroSliderTypeDefs   from './typeDefs/hero_slider_typeDefs.js'
+import AssetsInfoResolver   from './resolvers/AssetsInfoResolver.js';
+import AssetsInfoTypeDefs   from './typeDefs/AssetsInfoTypeDefs.js';
+import ProductTypeDefs      from './typeDefs/ProductTypeDefs.js';
+import ProductResolver      from './resolvers/ProductResolver.js';
 
 //Configuramos la lectura de las variables de entorno
-const enviroments_vars = config()
+const enviroments_vars = config();
 
 //Creamos el servidor web
 const express_server = express();
 
-connect_db()
+connectMongoDb()
 
 // Metodos de la Rest Api
 express_server.get('/', (req, res) => res.send('Welcome to 911 Love Api'));
 
 
-//Se encarga de inizializar el servidor
+//Se encarga de inizializar el servidor de apollo
 async function start() {
+
+    const typeDefs  = mergeTypeDefs([HeroSliderTypeDefs, AssetsInfoTypeDefs, ProductTypeDefs ]);
+    const resolvers = mergeResolvers([HeroSliderResolver,AssetsInfoResolver, ProductResolver]);
 
     // Same ApolloServer initialization as before, plus the drain plugin
     // for our httpServer.
@@ -26,7 +35,7 @@ async function start() {
         typeDefs : typeDefs,
         resolvers : resolvers
     })
-    
+
     // Ensure we wait for our server to start
     await apollo_sever.start();    
 

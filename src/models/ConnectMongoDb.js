@@ -1,6 +1,6 @@
 import {connect} from 'mongoose'
 
-const connect_db = async () => {
+const connectMongoDb = async () => {
     try {
         console.log("..........Antes de sonectarse    -----------------")
         await connect(process.env.MONGODB_URI)
@@ -13,4 +13,4 @@ const connect_db = async () => {
     }
 }
 
-export default connect_db;
+export default connectMongoDb;
